@@ -1,0 +1,79 @@
+﻿@model InstantTutors.Models.ViewModels.MessageCenterViewModel
+
+@{
+    ViewBag.Title = "Message Center";
+}
+
+<section class="welcome-sec wow fadeInUp animated" data-wow-duration="2s" style="padding-top:8px">
+    <div class="container">
+        @Html.Raw(@ViewBag.success)
+        <div class="row">
+            @using (Html.BeginForm("MessageCenter", "Dashboard", new { area = "Student" }, FormMethod.Post, new { @class = "form-horizontal", role = "form", @autocomplete = "off" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="col-12">
+                    <h4>@ViewBag.Title</h4>
+                    <p><small>Internal message communications between tutor and student. You can check messages for your future reference.</small></p>
+                    <hr />
+                </div>
+                <div class="col-6 col-sm-6">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Tutor, htmlAttributes: new { @class = "control-label lbl-required col-12 px-0" })
+                        <div class="col-12 px-0">
+                            @Html.DropDownListFor(m => m.Tutor, Model.Tutors, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Tutor, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-12">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.MessageBody, htmlAttributes: new { @class = "control-label lbl lbl-required" })
+                        @Html.TextAreaFor(model => model.MessageBody, 8, 100, new { @class = "form-control", placeholder = Html.DisplayNameFor(n => n.MessageBody) })
+                        @Html.ValidationMessageFor(model => model.MessageBody, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10 px-0">
+                            <input type="submit" value="Send Message" class="btn btn-success btn-lg" onclick="this.disabled=true;this.form.submit();" />
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-12">
+                <div class="table-responsive" style="margin-top: 5px;width:100%;">
+                    <table class="table mb-4 table-striped" id="tblid">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Message</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Created Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var Message in Model.Messages)
+                            {
+                            <tr>
+                                <td>@Message.MessageId</td>
+                                <td>@Message.MessageContent</td>
+                                <td>@Message.MessageFrom</td>
+                                <td>@Message.MessageTo</td>
+                                <td>@Message.CreatedDate</td>
+                            </tr>
+                            }
+                            @if (Model.Messages.Count == 0)
+                            {
+                                <tr><td colspan="5" class="text-center">NO RESULT FOUND.</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,135 @@
+﻿@model InstantTutors.Areas.Tutor.ViewModels.TutorSessionViewModel
+
+@{
+    ViewBag.Title = Model.Id > 0 ? "Edit Schedule" : "Schedule A Session";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            @using (Html.BeginForm("Schedule", "Session", new { area = "tutor" }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <br />
+                @Html.Raw(@ViewBag.success)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.UserId)
+                @Html.HiddenFor(model => model.User.FirstName)
+                @Html.HiddenFor(model => model.User.LastName)
+                @Html.HiddenFor(model => model.User.Email)
+                @Html.HiddenFor(model => model.User.PhoneNumber)
+                
+                @Html.HiddenFor(model => model.Title)
+                @Html.HiddenFor(model => model.Student)
+                @Html.HiddenFor(model => model.StartDate)
+                @Html.HiddenFor(model => model.EndDate)
+                @Html.HiddenFor(model => model.CommunicationMethod)
+                @Html.HiddenFor(model => model.Description)
+                <h4>Select Date & Time</h4>
+                <p><small>All Tutoring Sessions will be conducted by extremely qualified high school students or professionals.</small></p>
+                <hr />
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <div class="form-group">
+                            @Html.Label("Please choose 2+ Days/Times that you are available. ALL TIMES ARE IN EASTERN STANDARD TIME (EST).", "Please choose 2+ Days/Times that you are available. ALL TIMES ARE IN EASTERN STANDARD TIME (EST).", htmlAttributes: new { @class = "control-label lbl-required col-12 px-0" })
+                            <div class="col-12 px-0">
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        @*<table class="table table-striped table-bordered table-sm" style="height: 270px;display: inline-block;width: 100%;overflow: auto;">*@
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Day</th>
+                                                <th>10:00 A.M.</th>
+                                                <th>11:00 A.M.</th>
+                                                <th>12:00 A.M.</th>
+                                                <th>01:00 P.M.</th>
+                                                <th>02:00 P.M.</th>
+                                                <th>03:00 P.M.</th>
+                                                <th>04:00 P.M.</th>
+                                                <th>05:00 P.M.</th>
+                                                <th>06:00 P.M.</th>
+                                                <th>07:00 P.M.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (int i = 0; i < Model.SessionSchedules.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td>@Model.SessionSchedules[i].SelectedDate.ToShortDateString()</td>
+                                                    <td>@Model.SessionSchedules[i].Day.ToString()</td>
+                                                    @for (int j = 0; j < Model.SessionSchedules[i].Timing.Count; j++)
+                                                    {
+                                                        <td>
+                                                            <div class="custom-control custom-checkbox">
+                                                                @Html.CheckBoxFor(m => Model.SessionSchedules[i].Timing[j].Selected, new { @id = "customCheck-" + i + "-" + j, @class = "custom-control-input form-control" })
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].Timing[j].Time)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].Timing[j].AvailabilityTime)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].Id)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].UserId)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].Day)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].SessionId)
+                                                                @Html.HiddenFor(m => @Model.SessionSchedules[i].SelectedDate)
+                                                                <label class="custom-control-label" for="customCheck-@i-@j"></label>
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Concerns, htmlAttributes: new { @class = "control-label lbl col-12 px-0" })
+                            <div class="col-12 px-0">
+                                @Html.TextAreaFor(model => model.Concerns, 3, 100, new { @class = "form-control", placeholder = Html.DisplayNameFor(n => n.Concerns) })
+                                @Html.ValidationMessageFor(model => model.Concerns, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col-12">
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10 px-0">
+                                @if ((Model.CreatedBy != Model.UserId) && Model.CreatedBy != null)
+                                {
+                                    <input type="submit" value="@ViewBag.Title" class="btn btn-success btn-lg" disabled />
+                                }
+                                else
+                                {
+                                    <input type="submit" value="@ViewBag.Title" class="btn btn-success btn-lg" onclick="this.disabled=true;this.form.submit();" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    //$(document).ready(function () {
+    //    $('input[type=datetime]').datepicker({
+    //        dateFormat: "dd/M/yy",
+    //        changeMonth: true,
+    //        changeYear: true,
+    //        yearRange: "-60:+0"
+    //    });
+    //});
+</script>
+<style>
+    @@media only screen and (max-width: 767px) {
+        h3.head_title {
+            font-size: 20px;
+        }
+    }
+</style>

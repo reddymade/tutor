@@ -1,0 +1,78 @@
+﻿@model InstantTutors.Areas.Admin.ViewModels.AdminViewModel
+
+@{
+    ViewBag.Title = "Students";
+}
+<br />
+<section class="student-list">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                @Html.Raw(@ViewBag.success)
+                <div class="form-horizontal">
+                    <h4>
+                        Students List &nbsp;
+                    </h4>
+                    <hr />
+                    <div class="row">
+                        <div class="col-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table mb-0 table-striped" id="tblidPagination">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Grade </th>
+                                                    <th>School </th>
+                                                    <th style="width:24%;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var student in Model.StudentsList)
+                                                {
+                                                    <tr>
+                                                        <td>@student.User.FirstName&nbsp;@student.User.LastName</td>
+                                                        <td>@student.User.Email</td>
+                                                        <td>@student.User.PhoneNumber</td>
+                                                        <td>@student.User.StudentGrade</td>
+                                                        <td>@student.User.StudentSchool</td>
+                                                        <td>
+                                                            <a class="btn btn-info" href="@Url.Action("Index", "Session", new { area = "Admin", userid = student.User.Id })" hidefocus="hidefocus">
+                                                                View Sessions
+                                                            </a>
+                                                            @if (!@student.User.HasDisabled)
+                                                            {
+                                                                <a class="btn btn-success" href="@Url.Action("ActiveDeactivestudent", "Dashboard", new { area = "Admin", action = "Deactivate" ,userid = student.User.Id })" onclick="return confirm('Are you sure you want to diactivate?')">
+                                                                    Active
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a class="btn btn-secondary" href="@Url.Action("ActiveDeactivestudent", "Dashboard", new { area = "Admin", action = "Activate", userid = student.User.Id })" onclick="return confirm('Are you sure you want to Activate?')">
+                                                                    In-Active
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.StudentsList.Count == 0)
+                                                {
+                                                    <tr><td colspan="6">NO RESULT FOUND.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,80 @@
+﻿@model InstantTutors.Areas.Admin.ViewModels.AdminViewModel
+
+@{
+    ViewBag.Title = "Tutor";
+}
+<br />
+<section class="tutor-list">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                @Html.Raw(@ViewBag.success)
+                <div class="form-horizontal">
+                    <h4>
+                        Tutor List &nbsp;
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12">
+                            <div class="form-group">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table mb-0 table-striped" id="tblidPagination">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Grade </th>
+                                                    <th>School </th>
+                                                    <th>Previous Subjects </th>
+                                                    <th style="width:24%;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var tutor in Model.TutorsList)
+                                                {
+                                                    <tr>
+                                                        <td>@tutor.User.FirstName&nbsp;@tutor.User.LastName</td>
+                                                        <td>@tutor.User.Email</td>
+                                                        <td>@tutor.User.PhoneNumber</td>
+                                                        <td>@tutor.GradeLevel</td>
+                                                        <td>@tutor.NameOfSchool</td>
+                                                        <td>@tutor.PreviousSubjects</td>
+                                                        <td>
+                                                            <a class="btn btn-info" href="@Url.Action("Availability", "Session", new { area = "Admin", userid = tutor.User.Id })" hidefocus="hidefocus">
+                                                                View Availability
+                                                            </a>
+                                                            @if (!@tutor.User.HasDisabled)
+                                                            {
+                                                                <a class="btn btn-success" href="@Url.Action("ActiveDeactiveTutor", "Dashboard", new { area = "Admin", userid = tutor.User.Id })" onclick="return confirm('Are you sure you want to diactivate?')">
+                                                                    Active
+                                                                </a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a class="btn btn-secondary" href="@Url.Action("ActiveDeactiveTutor", "Dashboard", new { area = "Admin", userid = tutor.User.Id })" onclick="return confirm('Are you sure you want to Activate?')">
+                                                                    In-Active
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                @if (Model.TutorsList.Count == 0)
+                                                {
+                                                    <tr><td colspan="6">NO RESULT FOUND.</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

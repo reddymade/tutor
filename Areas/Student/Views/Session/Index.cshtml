@@ -1,0 +1,97 @@
+﻿@model InstantTutors.Areas.Student.ViewModels.StudentViewModel
+@{
+    ViewBag.Title = "Sessions";
+}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <br />
+            <h3 class="head_title">Sessions</h3>
+            <small>ALL TIMINGS ARE IN EASTERN STANDARD TIME (EST) &nbsp; <a href="@Url.Action("NewSchedule", "Session", new { area = "Student" })" hidefocus="hidefocus">Schedule A New Session</a></small>
+
+        </div>
+
+        <div class="col-12">
+            @Html.Raw(@ViewBag.success)
+            <div class="table-responsive" style="margin-top: 5px;">
+                <table class="table mb-4 table-striped" id="tblid">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Tutor</th>
+                            <th>Description</th>
+                            <th>Communication</th>
+                            <th>Created On</th>
+                            <th>Status</th>
+                            <th style="width:32%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var schedule in Model.SessionsList)
+                        {
+                            <tr>
+                                <td>@schedule.Title</td>
+                                <td>@schedule.TutorName</td>
+                                <td>@schedule.Description</td>
+                                <td>@schedule.CommunicationMethod</td>
+                                <td>@schedule.CreatedDate</td>
+                                <td>
+                                    @if (schedule.Status == 0)
+                                    {
+                                        <span style="color:gray; font-weight:bold;">Waiting For Approval</span>
+                                    }
+                                    else if (schedule.Status == 1)
+                                    {
+                                        <span style="color:#5cb85c;font-weight:bold;">Approved</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#d9534f;font-weight:bold;">Declined</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (schedule.Status == 0 && schedule.CreatedBy != schedule.UserId)
+                                    {
+                                        <a class="btn btn-primary" href="@Url.Action("ApproveSession", "Session", new { area = "Student", id = schedule.Id })" onclick="return confirm('Are you sure you want to approve?')">
+                                            Approve
+                                        </a>
+
+                                        <a class="btn btn-secondary" href="@Url.Action("DeclineSession", "Session", new { area = "Student", id = schedule.Id })" onclick="return confirm('Are you sure you want to decline?')">
+                                            Decline
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-outline-primary" disabled>Approve</button>
+                                        <button type="button" class="btn btn-outline-secondary" disabled>Decline</button>
+                                    }
+
+                                    <a disabled class="btn btn-info" href="@Url.Action("Schedule", "Session", new { area = "Student", id = schedule.Id })" hidefocus="hidefocus">
+                                        View
+                                    </a>
+                                    @if (schedule.CreatedBy == schedule.UserId)
+                                    {
+                                        <a class="btn btn-danger" href="@Url.Action("DeleteSession", "Session", new { area = "Student", id = schedule.Id }) " onclick="return confirm('Are you sure you want to delete?')">
+                                            Delete
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-outline-danger" disabled>Delete</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.SessionsList.Count == 0)
+                        {
+                            <tr><td colspan="5" class="text-center">NO RESULT FOUND.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+    </div>
+</div>

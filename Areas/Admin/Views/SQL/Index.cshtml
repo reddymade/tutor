@@ -1,0 +1,149 @@
+﻿@model InstantTutors.Areas.Admin.ViewModels.SQLViewModel
+
+@{
+    ViewBag.Title = "Sql Executor";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <br />
+            <h4>SQL Executor</h4>
+            <hr />
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <select name="ddlType" id="ddlType">
+                            <option value="1">Select Statement</option>
+                            <option value="2">Insert/Update/Delete Statement</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Query, htmlAttributes: new { @class = "control-label lbl-required" })
+                        @Html.TextAreaFor(model => model.Query, 4, 100, new { @class = "form-control", placeholder = Html.DisplayNameFor(n => n.Query) })
+                        @Html.ValidationMessageFor(model => model.Query, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <input type="button" value="Execute" class="btn btn-success" onclick="executeSql();" />
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div id="divMessage" class="alert alert-info" style="display:none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12" id="divTbl">
+
+        </div>
+    </div>
+
+</div>
+<script>
+    function executeSql() {
+        if ($('#Query').val() == null || $('#Query').val() == '') {
+            $("#divMessage").show();
+            $("#divMessage").html("<strong>Info!</strong> Please enter your Query");
+            return false;
+        }
+        if ($("#ddlType").val() == 1 && $('#Query').val().substring(0, 6).toLowerCase() != "select") {
+            $("#divMessage").show();
+            $("#divMessage").html("<strong>Info!</strong> Its not a select statement");
+            $("#divTbl").html("");
+            return false;
+        }
+
+        if ($("#ddlType").val() == 2 && $('#Query').val().substring(0, 6).toLowerCase() == "select") {
+            $("#divMessage").show();
+            $("#divMessage").html("<strong>Info!</strong> Its not a Insert/Update/Delete statement");
+            $("#divTbl").html("");
+            return false;
+        }
+
+        var res = $('#Query').val().substring(0, 6)
+        //$("#divLoader").show();
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: "/Admin/Sql/Index?query=" + $("#Query").val().trim(),
+            dataType: "json",
+            //data: JSON.stringify({ "query": $("#Query").val().trim() }),
+            async: false,
+            success: function (result) {
+                if (result.length > 0) {
+                    // CREATE DYNAMIC TABLE.
+                    var table = document.createElement("table");
+                    // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+                    table.id = "Resulttable";  //class="table mb-0"
+                    //table.class = "table mb-0";
+                    var tr = table.insertRow(-1);                   // TABLE ROW.
+                    for (var i = 0; i < result[0].length; i++) {
+                        var th = document.createElement("th");      // TABLE HEADER.
+                        th.innerHTML = result[0][i].Key;
+                        tr.appendChild(th);
+                    }
+                    // ADD JSON DATA TO THE TABLE AS ROWS.
+                    for (var i = 0; i < result.length; i++) {
+                        tr = table.insertRow(-1);
+                        for (var j = 0; j < result[i].length; j++) {
+                            var tabCell = tr.insertCell(-1);
+                            if (result[i][j].Key.indexOf('Date') > 0) {
+                                if (result[i][j].Value != null)
+                                    tabCell.innerHTML = eval(result[i][j].Value.replace(/\/Date\((\d+)\)\//gi, "new Date($1)"));// new Date(result[i][j].Value);
+                            }
+                            else {
+                                tabCell.innerHTML = result[i][j].Value;
+                            }
+                        }
+                    }
+                    // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+                    var divContainer = document.getElementById("divTbl");
+                    divContainer.innerHTML = "";
+                    divContainer.appendChild(table);
+                    $("#Resulttable").addClass("table mb-0");
+
+                    $("#divMessage").show();
+                    $("#divMessage").html("<strong>Success!</strong> Query Executed Successfully");
+                }
+                else {
+                    $("#divTbl").html("");
+                    if ($("#ddlType").val() == 1) {
+                        $("#divMessage").show();
+                        $("#divMessage").html("<strong>Info!</strong> No Record Found");
+                    }
+                    else {
+                        $("#divMessage").show();
+                        $("#divMessage").html("<strong>Success!</strong> Query Executed Successfully");
+                    }
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                // $("#divLoader").hide();
+                $("#divMessage").show();
+                $("#divMessage").html("<strong>Error!</strong> Please enter correct sql query");
+                $("#divTbl").html("");
+                return false;
+            }
+        });
+
+        $('#Resulttable').dataTable( {
+            'bSort': false,
+            'aoColumns': [
+                  { sWidth: "45%", bSearchable: false, bSortable: false },
+                  { sWidth: "45%", bSearchable: false, bSortable: false },
+                  { sWidth: "10%", bSearchable: false, bSortable: false },
+                  //match the number of columns here for table2
+            ],
+            "scrollY":        "200px",
+            "scrollCollapse": false,
+            "info":           true,
+            "paging":         true
+        } );
+    }
+</script>
+
